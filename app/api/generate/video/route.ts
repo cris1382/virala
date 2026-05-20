@@ -69,11 +69,12 @@ export async function POST(request: NextRequest) {
       ratio: ratio as "1280:768" | "768:1280" | undefined,
     });
 
-    // Poll for completion
     const startTime = Date.now();
-    let currentTask = task;
 
     while (Date.now() - startTime < MAX_WAIT_MS) {
+      await new Promise<void>((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+      const currentTask = await runway.tasks.retrieve(task.id);
+
       if (currentTask.status === "SUCCEEDED") {
         const videoUrl = currentTask.output?.[0] ?? null;
 
@@ -98,9 +99,6 @@ export async function POST(request: NextRequest) {
       ) {
         throw new Error(`Runway task ${currentTask.status.toLowerCase()}`);
       }
-
-      await new Promise<void>((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
-      currentTask = await runway.tasks.retrieve(task.id);
     }
 
     throw new Error("Video generation timed out after 3 minutes");
