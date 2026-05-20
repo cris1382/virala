@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
   const imageUrl = typeof body.imageUrl === "string" ? body.imageUrl.trim() : "";
   const duration = body.duration === 10 ? 10 : 5;
   const ratio =
-    typeof body.ratio === "string" ? body.ratio : "1280:720";
+    typeof body.ratio === "string" ? body.ratio : "1280:768";
 
   if (!prompt) {
     return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       promptImage: imageUrl,
       promptText: prompt,
       duration,
-      ratio: ratio as "1280:720" | "720:1280" | "1024:1024",
+      ratio: ratio as "1280:768" | "768:1280" | undefined,
     });
 
     // Poll for completion
