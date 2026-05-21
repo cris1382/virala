@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@/lib/supabase/server";
+import {
+  getPlanFromPriceId,
+  getStripePriceId,
+  isPaidPlanKey,
+} from "@/lib/stripe/config";
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
@@ -13,10 +18,19 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const priceId = typeof body.priceId === "string" ? body.priceId : null;
+  const requestedPriceId = typeof body.priceId === "string" ? body.priceId : null;
+  const requestedPlan = typeof body.plan === "string" ? body.plan : null;
 
-  if (!priceId) {
-    return NextResponse.json({ error: "priceId is required" }, { status: 400 });
+  const plan = requestedPlan && isPaidPlanKey(requestedPlan)
+    ? requestedPlan
+    : getPlanFromPriceId(requestedPriceId);
+  const priceId = plan ? getStripePriceId(plan) : null;
+
+  if (!plan || !priceId) {
+    return NextResponse.json(
+      { error: "A valid paid Virala plan is required." },
+      { status: 400 }
+    );
   }
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -31,7 +45,7 @@ export async function POST(request: NextRequest) {
       cancel_url: `${appUrl}/dashboard`,
       customer_email: user.email,
       client_reference_id: user.id,
-      metadata: { userId: user.id },
+      metadata: { userId: user.id, plan, priceId },
     });
 
     return NextResponse.json({ url: session.url });

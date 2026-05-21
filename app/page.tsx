@@ -11,6 +11,12 @@ export default function Home() {
         <span className="text-2xl font-bold gradient-violet-text">Virala</span>
         <div className="flex gap-4">
           <Link
+            href="/pricing"
+            className="px-4 py-2 text-sm text-[var(--muted)] hover:text-white transition-colors"
+          >
+            Pricing
+          </Link>
+          <Link
             href="/login"
             className="px-4 py-2 text-sm text-[var(--muted)] hover:text-white transition-colors"
           >
@@ -44,6 +50,12 @@ export default function Home() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4">
+          <Link
+            href="/pricing"
+            className="px-8 py-4 text-base font-semibold text-white rounded-xl bg-[var(--secondary)] border border-[var(--border)] hover:border-[var(--primary)] transition-colors"
+          >
+            View Pricing
+          </Link>
           <Link
             href="/signup"
             className="px-8 py-4 text-base font-semibold text-white rounded-xl gradient-violet glow-violet hover:opacity-90 transition-opacity"
